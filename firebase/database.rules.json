@@ -1,0 +1,197 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "admins": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('admins').child(auth.uid).val() === true)",
+        ".write": false
+      }
+    },
+
+    "platformSettings": {
+      ".read": true,
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+    },
+
+    "games": {
+      ".read": true,
+      ".indexOn": ["enabled", "featured", "category"],
+      "$gameId": {
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+      }
+    },
+
+    "announcements": {
+      ".read": "auth != null",
+      ".indexOn": ["pinned", "createdAt"],
+      "$announcementId": {
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+      }
+    },
+
+    "tournaments": {
+      ".read": "auth != null",
+      ".indexOn": ["startsAt", "gameId"],
+      "$tournamentId": {
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        "registeredUids": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && root.child('users').child(auth.uid).child('status').val() === 'active'"
+          }
+        }
+      }
+    },
+
+    "usernames": {
+      ".read": true,
+      "$username": {
+        ".write": "auth != null && ((!data.exists() && newData.val() === auth.uid) || root.child('admins').child(auth.uid).val() === true)",
+        ".validate": "newData.isString() && $username.matches(/^[a-z0-9_]{3,20}$/)"
+      }
+    },
+
+    "publicProfiles": {
+      ".read": "auth != null",
+      ".indexOn": ["username", "online", "xp", "wins"],
+      "$uid": {
+        ".write": "auth != null && ((auth.uid === $uid && (!data.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')) || root.child('admins').child(auth.uid).val() === true)",
+        "xp": {
+          ".validate": "!data.exists() ? newData.val() === 0 : (newData.val() === data.val() || root.child('admins').child(auth.uid).val() === true)"
+        },
+        "wins": {
+          ".validate": "!data.exists() ? newData.val() === 0 : (newData.val() === data.val() || root.child('admins').child(auth.uid).val() === true)"
+        },
+        "level": {
+          ".validate": "!data.exists() ? newData.val() === 1 : (newData.val() === data.val() || root.child('admins').child(auth.uid).val() === true)"
+        }
+      }
+    },
+
+    "users": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      ".indexOn": ["username", "status", "joinDate", "online"],
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('admins').child(auth.uid).val() === true)",
+        ".write": "auth != null && ((auth.uid === $uid && (!data.exists() || data.child('status').val() === 'active')) || root.child('admins').child(auth.uid).val() === true)",
+        "role": {
+          ".validate": "newData.val() === 'player' || root.child('admins').child(auth.uid).val() === true"
+        },
+        "status": {
+          ".validate": "(!data.exists() && newData.val() === 'active') || newData.val() === data.val() || root.child('admins').child(auth.uid).val() === true"
+        },
+        "coins": {
+          ".validate": "(!data.exists() && newData.val() === 0) || newData.val() === data.val() || root.child('admins').child(auth.uid).val() === true"
+        },
+        "xp": {
+          ".validate": "(!data.exists() && newData.val() === 0) || newData.val() === data.val() || root.child('admins').child(auth.uid).val() === true"
+        },
+        "level": {
+          ".validate": "(!data.exists() && newData.val() === 1) || newData.val() === data.val() || root.child('admins').child(auth.uid).val() === true"
+        },
+        "wins": {
+          ".validate": "(!data.exists() && newData.val() === 0) || newData.val() === data.val() || root.child('admins').child(auth.uid).val() === true"
+        },
+        "losses": {
+          ".validate": "(!data.exists() && newData.val() === 0) || newData.val() === data.val() || root.child('admins').child(auth.uid).val() === true"
+        },
+        "gamesPlayed": {
+          ".validate": "(!data.exists() && newData.val() === 0) || newData.val() === data.val() || root.child('admins').child(auth.uid).val() === true"
+        }
+      }
+    },
+
+    "rooms": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('status').val() === 'active'",
+      ".indexOn": ["code", "isPrivate", "status", "gameId", "createdAt"],
+      "$roomId": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('status').val() === 'active' && (!data.exists() || data.child('hostUid').val() === auth.uid || data.child('participants').child(auth.uid).exists() || newData.child('participants').child(auth.uid).exists() || root.child('admins').child(auth.uid).val() === true)",
+        ".validate": "!newData.exists() || (newData.hasChildren(['roomId', 'code', 'gameId', 'hostUid', 'maxPlayers', 'status']) && newData.child('maxPlayers').val() >= 2 && newData.child('maxPlayers').val() <= 8)"
+      }
+    },
+
+    "gameSessions": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      ".indexOn": ["roomId", "gameId", "status", "startedAt"],
+      "$sessionId": {
+        ".read": "auth != null && (data.child('players').child(auth.uid).exists() || root.child('admins').child(auth.uid).val() === true)",
+        ".write": "auth != null && root.child('users').child(auth.uid).child('status').val() === 'active' && (!data.exists() || data.child('players').child(auth.uid).exists() || root.child('admins').child(auth.uid).val() === true)"
+      }
+    },
+
+    "messages": {
+      "$roomId": {
+        ".read": "auth != null && (root.child('rooms').child($roomId).child('participants').child(auth.uid).exists() || root.child('admins').child(auth.uid).val() === true)",
+        ".indexOn": ["createdAt", "senderUid"],
+        "$messageId": {
+          ".write": "auth != null && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('platformSettings').child('chatEnabled').val() !== false && ((root.child('rooms').child($roomId).child('participants').child(auth.uid).exists() && !data.exists() && newData.child('senderUid').val() === auth.uid && newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 240) || root.child('admins').child(auth.uid).val() === true)"
+        }
+      }
+    },
+
+    "friends": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('admins').child(auth.uid).val() === true)",
+        "$friendUid": {
+          ".write": "auth != null && (auth.uid === $uid || auth.uid === $friendUid || root.child('admins').child(auth.uid).val() === true)"
+        }
+      }
+    },
+
+    "friendRequests": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('admins').child(auth.uid).val() === true)",
+        "$reqId": {
+          ".write": "auth != null && (auth.uid === $uid || newData.child('fromUid').val() === auth.uid || data.child('fromUid').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)"
+        }
+      }
+    },
+
+    "notifications": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('admins').child(auth.uid).val() === true)",
+        ".indexOn": ["createdAt", "read"],
+        "$notifId": {
+          ".write": "auth != null && (auth.uid === $uid || !data.exists() || root.child('admins').child(auth.uid).val() === true)"
+        }
+      }
+    },
+
+    "leaderboards": {
+      ".read": "auth != null",
+      "$boardId": {
+        ".indexOn": ["score", "xp", "wins"],
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+      }
+    },
+
+    "achievements": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('admins').child(auth.uid).val() === true)",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+      }
+    },
+
+    "reports": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      ".indexOn": ["status", "createdAt", "reportedUid"],
+      "$reportId": {
+        ".write": "auth != null && ((!data.exists() && newData.child('reporterUid').val() === auth.uid) || root.child('admins').child(auth.uid).val() === true)"
+      }
+    },
+
+    "deletionRequests": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('admins').child(auth.uid).val() === true)",
+        ".write": "auth != null && (auth.uid === $uid || root.child('admins').child(auth.uid).val() === true)"
+      }
+    },
+
+    "adminLogs": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      ".indexOn": ["timestamp", "adminUid", "action"]
+    }
+  }
+}

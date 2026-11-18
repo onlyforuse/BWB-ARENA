@@ -1,0 +1,6 @@
+{
+  "name": "BWB ARENA",
+  "description": "Premium multiplayer esports gaming platform — Play Together. Compete Forever. Created by Satyam (BWB).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
