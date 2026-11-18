@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ShieldAlert, Wrench } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Wrench } from 'lucide-react';
 import { ArenaProvider, useArena } from './context/ArenaContext';
 import { FullScreenLoader } from './components/common/Skeletons';
 import { ToastViewport } from './components/common/ToastViewport';
-import { BrandMark } from './components/common/BrandMark';
 import { LandingAuthView } from './components/auth/LandingAuthView';
 import { AppShell } from './components/layout/AppShell';
 import { HomeDashboardView } from './components/views/HomeDashboardView';
@@ -20,38 +20,29 @@ import { NotificationsView } from './components/views/NotificationsView';
 import { ProfileView } from './components/views/ProfileView';
 import { SettingsView } from './components/views/SettingsView';
 import { GameArenaModal } from './components/games/GameArenaModal';
+import { SuperAdminApp } from './components/admin/SuperAdminApp';
+import { isAdminLocation } from './lib/routing';
 
 function ArenaRouter() {
   const { authReady, player, activeNav, platformSettings } = useArena();
+  const [isAdminPath, setIsAdminPath] = useState(() =>
+    typeof window !== 'undefined' ? isAdminLocation(window.location.pathname, window.location.hash) : false,
+  );
 
-  const isAdminPath = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+  useEffect(() => {
+    const syncRoute = () => {
+      setIsAdminPath(isAdminLocation(window.location.pathname, window.location.hash));
+    };
+    window.addEventListener('hashchange', syncRoute);
+    window.addEventListener('popstate', syncRoute);
+    return () => {
+      window.removeEventListener('hashchange', syncRoute);
+      window.removeEventListener('popstate', syncRoute);
+    };
+  }, []);
 
   if (isAdminPath) {
-    return (
-      <div className="min-h-screen bg-canvas text-ink flex items-center justify-center p-6">
-        <div className="arena-surface rounded-2xl max-w-md w-full p-6 text-center space-y-4">
-          <div className="flex justify-center">
-            <BrandMark size={40} />
-          </div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-mono text-[#22D3EE]">
-            <ShieldAlert className="w-4 h-4" />
-            <span>Private Route · /admin</span>
-          </div>
-          <h1 className="font-display text-2xl font-bold text-ink">BWB ARENA Super Admin Panel</h1>
-          <p className="text-sm text-muted leading-relaxed">
-            The Player Panel is live on <code className="font-mono text-ink">/</code>. The Super Admin Panel is staged
-            for installation when you request it next, wired directly to this same <code className="font-mono text-ink">bwb-arena</code>{' '}
-            Firebase Realtime Database.
-          </p>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center h-10 px-5 rounded-xl arena-gradient-btn text-xs font-semibold"
-          >
-            Return to Player Panel
-          </a>
-        </div>
-      </div>
-    );
+    return <SuperAdminApp />;
   }
 
   if (!authReady && !player) {

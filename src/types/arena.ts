@@ -318,3 +318,81 @@ export interface ToastItem {
   title: string;
   message?: string;
 }
+
+// ---------------------------------------------------------------------------
+// Super Admin Panel Types
+// ---------------------------------------------------------------------------
+
+export type AdminNavSection =
+  | 'overview'
+  | 'users'
+  | 'games'
+  | 'rooms'
+  | 'moderation'
+  | 'announcements'
+  | 'tournaments'
+  | 'leaderboards'
+  | 'settings'
+  | 'logs';
+
+export type ReportStatus = 'open' | 'resolved' | 'dismissed';
+
+export interface AdminReport {
+  id: string;
+  type: 'chat_message' | 'player_conduct' | 'gameplay_abuse';
+  status: ReportStatus;
+  roomId?: string;
+  messageId?: string;
+  messageText?: string;
+  reportedUid: string;
+  reportedUsername: string;
+  reporterUid: string;
+  reporterUsername: string;
+  reason: string;
+  createdAt: number;
+  resolvedAt?: number;
+  resolvedBy?: string;
+  resolutionNote?: string;
+  messageDeleted?: boolean;
+}
+
+export interface AccountDeletionRequest {
+  uid: string;
+  username: string;
+  email: string;
+  reason: string;
+  requestedAt: number;
+  status: 'pending' | 'approved' | 'rejected';
+  processedAt?: number;
+  processedBy?: string;
+}
+
+export type AdminAuditCategory =
+  | 'user'
+  | 'economy'
+  | 'game'
+  | 'room'
+  | 'moderation'
+  | 'announcement'
+  | 'tournament'
+  | 'leaderboard'
+  | 'settings';
+
+export interface AdminLogEntry {
+  id: string;
+  timestamp: number;
+  adminUid: string;
+  adminEmail: string;
+  category: AdminAuditCategory;
+  action: string;
+  target: string;
+  details: string;
+}
+
+export interface AdminActor {
+  uid: string;
+  email: string;
+  displayName: string;
+  mode: 'firebase' | 'sandbox';
+}
+

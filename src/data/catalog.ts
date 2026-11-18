@@ -8,7 +8,14 @@ import type {
   TournamentItem,
 } from '../types/arena';
 
-export const HERO_ARENA_IMAGE = '/src/assets/images/hero_arena_stage_1795010803781.jpg';
+import heroArenaImg from '../assets/images/hero_arena_stage_1795010803781.jpg';
+import gameCanYouGuessImg from '../assets/images/game_can_you_guess_1795010803871.jpg';
+import gameQuizBattleImg from '../assets/images/game_quiz_battle_1795010803593.jpg';
+import gameTicTacToeImg from '../assets/images/game_tic_tac_toe_1795010803784.jpg';
+import gameRpsImg from '../assets/images/game_rock_paper_scissors_1795010804348.jpg';
+import gameWordBattleImg from '../assets/images/game_word_battle_1795010804387.jpg';
+
+export const HERO_ARENA_IMAGE = heroArenaImg;
 
 export const AVATAR_PRESETS = [
   { id: 'cyber-wolf', label: 'Vanguard', bg: 'from-violet-600 to-indigo-700', glyph: 'VG' },
@@ -43,7 +50,7 @@ export const INITIAL_GAMES_CATALOG: ArenaGameDefinition[] = [
     category: 'Creative',
     description:
       'Real-time multiplayer sketching showdown. Draw secret prompts on the synced obsidian canvas while rivals race the clock to guess first.',
-    thumbnail: '/src/assets/images/game_can_you_guess_1795010803871.jpg',
+    thumbnail: gameCanYouGuessImg,
     minPlayers: 2,
     maxPlayers: 8,
     enabled: true,
@@ -67,7 +74,7 @@ export const INITIAL_GAMES_CATALOG: ArenaGameDefinition[] = [
     category: 'Trivia',
     description:
       'High-speed competitive trivia across esports, tech, science, and world knowledge. Lock answers fast to build streak multipliers.',
-    thumbnail: '/src/assets/images/game_quiz_battle_1795010803593.jpg',
+    thumbnail: gameQuizBattleImg,
     minPlayers: 2,
     maxPlayers: 8,
     enabled: true,
@@ -91,7 +98,7 @@ export const INITIAL_GAMES_CATALOG: ArenaGameDefinition[] = [
     category: 'Strategy',
     description:
       'Classic 3x3 tactical duel elevated to a best-of-3 arena series with turn timers, instant rematches, and Minimax practice bots.',
-    thumbnail: '/src/assets/images/game_tic_tac_toe_1795010803784.jpg',
+    thumbnail: gameTicTacToeImg,
     minPlayers: 2,
     maxPlayers: 2,
     enabled: true,
@@ -115,7 +122,7 @@ export const INITIAL_GAMES_CATALOG: ArenaGameDefinition[] = [
     category: 'Arcade',
     description:
       'Simultaneous hidden-lock best-of-5 mind game. Read patterns, lock your emblem before the buzzer, and break enemy streaks.',
-    thumbnail: '/src/assets/images/game_rock_paper_scissors_1795010804348.jpg',
+    thumbnail: gameRpsImg,
     minPlayers: 2,
     maxPlayers: 2,
     enabled: true,
@@ -139,7 +146,7 @@ export const INITIAL_GAMES_CATALOG: ArenaGameDefinition[] = [
     category: 'Word',
     description:
       'Head-to-head 5-letter deduction race. Crack the target word in up to 6 attempts with color and icon tile feedback before your rival.',
-    thumbnail: '/src/assets/images/game_word_battle_1795010804387.jpg',
+    thumbnail: gameWordBattleImg,
     minPlayers: 2,
     maxPlayers: 6,
     enabled: true,
